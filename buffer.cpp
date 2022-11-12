@@ -22,7 +22,7 @@ int32_t Buffer::pop()
 {
     if(buffer_pos == 0)
     {
-        printf("Buffer is empty!");
+        printf("Buffer is empty!\n\n");
         return NULL;
     }
     int32_t r = buffer_queue[0];

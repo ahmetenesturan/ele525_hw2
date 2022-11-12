@@ -7,6 +7,7 @@
 #define BUFFER_SIZE 10
 
 void fn_producer_thread();
+void fn_consumer_thread();
 
 Buffer* buffer = new Buffer(BUFFER_SIZE);
 
@@ -16,7 +17,9 @@ int main()
     srand(time(NULL));
 
     Thread* producer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Producer Thread");
-    producer_thread->start(&fn_producer_thread);
+    Thread* consumer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread");
+    //producer_thread->start(&fn_producer_thread);
+    consumer_thread->start(&fn_consumer_thread);
 
 
     while (true);
@@ -29,6 +32,16 @@ void fn_producer_thread()
     {
         int32_t data = rand() % 10 + 1;
         buffer->push(data);
-        printf("Buffer:%d\n",buffer->buffer_pos);
+        printf("Buffer Capacity:%d\n",buffer->buffer_pos);
+    }
+}
+
+void fn_consumer_thread()
+{
+    while(true)
+    {
+        int32_t data = buffer->pop();
+        printf("Buffer Capacity:%d\n",buffer->buffer_pos);
+        if(buffer->buffer_pos == 0) break;
     }
 }
