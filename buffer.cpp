@@ -1,21 +1,4 @@
 #include "buffer.h"
-#include <cstdint>
-#include <cstdio>
-#include <stdint.h>
-
-
-class Buffer
-{
-    private:
-    uint16_t buffer_size;
-    uint16_t buffer_pos;
-    int32_t* buffer_queue;
-
-    public:
-    Buffer(uint16_t);
-    void push(int32_t);
-    uint32_t pop();
-};
 
 Buffer::Buffer(uint16_t size)
 {
@@ -26,23 +9,27 @@ Buffer::Buffer(uint16_t size)
 
 void Buffer::push(int32_t data)
 {
-    if(buffer_pos == 10)
+    if(buffer_pos == buffer_size)
     {
-        printf("Buffer is full!");
+        printf("Buffer is full!\n\n");
         return;
     }
     buffer_queue[buffer_pos] = data;
     buffer_pos++;
 }
 
-uint32_t Buffer::pop()
+int32_t Buffer::pop()
 {
     if(buffer_pos == 0)
     {
         printf("Buffer is empty!");
         return NULL;
     }
-    uint32_t temp = buffer_queue[buffer_pos - 1];
+    int32_t r = buffer_queue[0];
+    for(int i = buffer_pos - 1; i > 0; i--)
+    {
+        buffer_queue[i-1] = buffer_queue[i];
+    }
     buffer_pos--;
-    for(int i = 0; i < buffer_pos; i++)
+    return r;
 }
