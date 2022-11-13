@@ -9,22 +9,28 @@ Buffer::Buffer(uint16_t size)
 
 void Buffer::push(int32_t data)
 {
+    /*
     if(buffer_pos == buffer_size)
     {
-        printf("Buffer is full!\n\n");
+        //printf("Buffer is full!\n\n");
+        printf("F");
         return;
     }
+    */
     buffer_queue[buffer_pos] = data;
     buffer_pos++;
 }
 
 int32_t Buffer::pop()
 {
+    /*
     if(buffer_pos == 0)
     {
-        printf("Buffer is empty!\n\n");
+        //printf("Buffer is empty!\n\n");
+        printf("E");
         return NULL;
     }
+    */
     int32_t r = buffer_queue[0];
     for(int i = buffer_pos - 1; i > 0; i--)
     {
