@@ -8,6 +8,7 @@
 
 void fn_producer_thread();
 void fn_consumer_thread();
+void fn_consumer_thread_2();
 
 Buffer* buffer = new Buffer(BUFFER_SIZE);
 
@@ -18,8 +19,10 @@ int main()
 
     Thread* producer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Producer Thread");
     Thread* consumer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread");
+    Thread* consumer_thread_2 = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread 2");
     producer_thread->start(&fn_producer_thread);
     consumer_thread->start(&fn_consumer_thread);
+    consumer_thread_2->start(&fn_consumer_thread_2);
 
 
     while (true)
@@ -41,6 +44,17 @@ void fn_producer_thread()
 }
 
 void fn_consumer_thread()
+{
+    while(true)
+    {
+        int32_t data = buffer->pop();
+        //printf("%d\n",buffer->buffer_pos);
+        //thread_sleep_for(500);
+        //if(buffer->buffer_pos == 0) break;
+    }
+}
+
+void fn_consumer_thread_2()
 {
     while(true)
     {

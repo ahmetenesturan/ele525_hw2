@@ -1,6 +1,6 @@
 #include "buffer.h"
 
-Buffer::Buffer(uint16_t size)
+Buffer::Buffer(int16_t size)
 {
     buffer_size = size;
     buffer_queue = new int32_t[size];
