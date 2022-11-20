@@ -5,38 +5,26 @@
 
 #define BUFFER_SIZE 10u
 
-
 Mutex buffer_mutex;
-
 Semaphore buffer_semaphore(0,BUFFER_SIZE);
+int32_t* buffer = new int32_t[BUFFER_SIZE];
+int32_t i = 0;
 
 void fn_producer_thread();
 void fn_consumer_thread();
 void fn_consumer_thread_2();
 
-
-int32_t* buffer = new int32_t[BUFFER_SIZE];
-int32_t i = 0;
-
 int main()
 {
-    srand(time(NULL));
-/*
-    buffer_mutex.lock();
-    buffer[i] = rand() % 10 + 1;
-    i++;
-
-    buffer[i] = rand() % 10 + 1;
-    i++;
-    buffer_mutex.unlock();
-*/
+    srand(time(NULL)); //for rng
+    
     Thread* producer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Producer Thread");
     Thread* consumer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread");
     Thread* consumer_thread_2 = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread 2");
+
     producer_thread->start(&fn_producer_thread);
     consumer_thread->start(&fn_consumer_thread);
     consumer_thread_2->start(&fn_consumer_thread_2);
-
 
     while (true);
 }
@@ -48,7 +36,6 @@ void fn_producer_thread()
     {
         buffer_semaphore.release();
         buffer_mutex.lock();
-        //buffer_semaphore.release();
         buffer[i] = rand() % 10 + 1;
         i++;
         printf("%d\n",i);
@@ -63,7 +50,6 @@ void fn_consumer_thread()
     {
         buffer_semaphore.acquire();
         buffer_mutex.lock();
-        //buffer_semaphore.acquire();
         int32_t data = buffer[i-1];
         i--;
         printf("%d\n",i);
@@ -78,11 +64,9 @@ void fn_consumer_thread_2()
     {
         buffer_semaphore.acquire();
         buffer_mutex.lock();
-        //buffer_semaphore.acquire();
         int32_t data = buffer[i-1];
         i--;
         printf("%d\n",i);
-        //}
         buffer_mutex.unlock();
         thread_sleep_for(1000);
     }
