@@ -1,22 +1,35 @@
 #include "mbed.h"
-#include "buffer.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstdint>
 
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 10u
+
+
+Mutex buffer_mutex;
+
+Semaphore buffer_semaphore(1);
 
 void fn_producer_thread();
 void fn_consumer_thread();
 void fn_consumer_thread_2();
 
-Buffer* buffer = new Buffer(BUFFER_SIZE);
 
+int32_t* buffer = new int32_t[BUFFER_SIZE];
+int32_t i = 0;
 
 int main()
 {
     srand(time(NULL));
+/*
+    buffer_mutex.lock();
+    buffer[i] = rand() % 10 + 1;
+    i++;
 
+    buffer[i] = rand() % 10 + 1;
+    i++;
+    buffer_mutex.unlock();
+*/
     Thread* producer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Producer Thread");
     Thread* consumer_thread = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread");
     Thread* consumer_thread_2 = new Thread(osPriorityNormal, 2048, nullptr, "Consumer Thread 2");
@@ -25,10 +38,7 @@ int main()
     consumer_thread_2->start(&fn_consumer_thread_2);
 
 
-    while (true)
-    {
-        printf("%d\n",buffer->buffer_pos);
-    }
+    while (true);
 }
 
 
@@ -36,10 +46,14 @@ void fn_producer_thread()
 {
     while(true)
     {
-        int32_t data = rand() % 10 + 1;
-        buffer->push(data);
-        //printf("%d\n",buffer->buffer_pos);
-        //thread_sleep_for(500);
+        buffer_mutex.lock();
+        buffer[i] = rand() % 10 + 1;
+        i++;
+        printf("%d\n",i);
+        
+        buffer_mutex.unlock();
+
+        thread_sleep_for(1000);
     }
 }
 
@@ -47,10 +61,21 @@ void fn_consumer_thread()
 {
     while(true)
     {
-        int32_t data = buffer->pop();
-        //printf("%d\n",buffer->buffer_pos);
-        //thread_sleep_for(500);
-        //if(buffer->buffer_pos == 0) break;
+        buffer_semaphore.acquire();
+        buffer_mutex.lock();
+        
+        
+        //if(i > 0)
+        //{
+            buffer_semaphore.release();
+            int32_t data = buffer[i-1];
+            i--;
+            printf("%d\n",i);
+        //}
+                buffer_semaphore.release();
+        buffer_mutex.unlock();
+
+        thread_sleep_for(1000);
     }
 }
 
@@ -58,9 +83,19 @@ void fn_consumer_thread_2()
 {
     while(true)
     {
-        int32_t data = buffer->pop();
-        //printf("%d\n",buffer->buffer_pos);
-        //thread_sleep_for(500);
-        //if(buffer->buffer_pos == 0) break;
+        buffer_semaphore.acquire();
+        buffer_mutex.lock();
+        
+        //if(i > 0)
+        //{
+            
+            int32_t data = buffer[i-1];
+            i--;
+            printf("%d\n",i);
+        //}
+        
+        buffer_mutex.unlock();
+        buffer_semaphore.release();
+        thread_sleep_for(1000);
     }
 }
