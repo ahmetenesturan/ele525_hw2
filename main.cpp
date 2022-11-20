@@ -8,7 +8,7 @@
 
 Mutex buffer_mutex;
 
-Semaphore buffer_semaphore(1);
+Semaphore buffer_semaphore(0,BUFFER_SIZE);
 
 void fn_producer_thread();
 void fn_consumer_thread();
@@ -46,13 +46,13 @@ void fn_producer_thread()
 {
     while(true)
     {
+        buffer_semaphore.release();
         buffer_mutex.lock();
+        //buffer_semaphore.release();
         buffer[i] = rand() % 10 + 1;
         i++;
         printf("%d\n",i);
-        
         buffer_mutex.unlock();
-
         thread_sleep_for(1000);
     }
 }
@@ -63,18 +63,11 @@ void fn_consumer_thread()
     {
         buffer_semaphore.acquire();
         buffer_mutex.lock();
-        
-        
-        //if(i > 0)
-        //{
-            buffer_semaphore.release();
-            int32_t data = buffer[i-1];
-            i--;
-            printf("%d\n",i);
-        //}
-                buffer_semaphore.release();
+        //buffer_semaphore.acquire();
+        int32_t data = buffer[i-1];
+        i--;
+        printf("%d\n",i);
         buffer_mutex.unlock();
-
         thread_sleep_for(1000);
     }
 }
@@ -85,17 +78,12 @@ void fn_consumer_thread_2()
     {
         buffer_semaphore.acquire();
         buffer_mutex.lock();
-        
-        //if(i > 0)
-        //{
-            
-            int32_t data = buffer[i-1];
-            i--;
-            printf("%d\n",i);
+        //buffer_semaphore.acquire();
+        int32_t data = buffer[i-1];
+        i--;
+        printf("%d\n",i);
         //}
-        
         buffer_mutex.unlock();
-        buffer_semaphore.release();
         thread_sleep_for(1000);
     }
 }
